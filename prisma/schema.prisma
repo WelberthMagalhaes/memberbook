@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model people {
+  id           Int       @id @default(autoincrement())
+  name         String
+  last_name    String
+  birth_date   DateTime
+  email        String    @unique
+  phone        String
+  is_member    Boolean   @default(false)
+  baptism_date DateTime?
+  users        users?
+  address      address?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  person     people    @relation(fields: [person_id], references: [id])
+  person_id  Int       @unique
+  role       role      @default(USER)
+  password   String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  logs       logs[]
+}
+
+model address {
+  id           Int      @id @default(autoincrement())
+  street       String
+  neighborhood String
+  city         String
+  state        String
+  postal_code  String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  people       people?  @relation(fields: [people_id], references: [id], onDelete: Cascade)
+  people_id    Int?     @unique
+}
+
+model logs {
+  id          Int      @id @default(autoincrement())
+  action      String
+  description String
+  user        users?   @relation(fields: [user_id], references: [id])
+  user_id     Int?
+  timestamp   DateTime @default(now())
+}
+
+enum role {
+  ADMIN
+  MANAGER
+  USER
+}
