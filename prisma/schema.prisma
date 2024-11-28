@@ -51,7 +51,7 @@ model address {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   people       people?  @relation(fields: [people_id], references: [id], onDelete: Cascade)
-  people_id    Int?     @unique
+  people_id    Int     @unique
 }
 
 model logs {
